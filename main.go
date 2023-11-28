@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"path"
 
 	//"go/types"
 	"log"
@@ -31,35 +33,35 @@ func main() {
 	// 	fmt.Printf("%v\n", obj.Key)
 	// }
 	// return
-	// rootDir := "/Users/tom/Downloads/theater_demos"
-	// files, err := os.ReadDir(rootDir)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	files := []string{
-		// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/LG 4K HDR Demo - New York.ts",
-
-		// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-Ride-on-Board-4K-(www.demolandia.net).ts",
-
-		// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-and-RedBull-See-the-Unexpected-HDR-UHD-4K-(www.demolandia.net).ts",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony 4K HDR Demo - New York Fashion.mp4",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony-Food-Fizzle-UHD-4K-(www.demolandia.net).mp4",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony-Swordsmith-HDR-UHD-4K-(www.demolandia.net).mp4",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/bbb_sunflower_2160p_60fps_normal.mp4",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/dolby-chameleon-uhd-(www.demolandia.net).mkv",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/gopro1.mp4",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/imax-cliffhanger-flat-(www.demolandia.net).mkv",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/tearsofsteel_4k.mov",
+	rootDir := "/videos"
+	files, err := os.ReadDir(rootDir)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	// files := []string{
+	// 	// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/LG 4K HDR Demo - New York.ts",
+
+	// 	// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-Ride-on-Board-4K-(www.demolandia.net).ts",
+
+	// 	// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-and-RedBull-See-the-Unexpected-HDR-UHD-4K-(www.demolandia.net).ts",
+
+	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony 4K HDR Demo - New York Fashion.mp4",
+
+	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony-Food-Fizzle-UHD-4K-(www.demolandia.net).mp4",
+
+	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony-Swordsmith-HDR-UHD-4K-(www.demolandia.net).mp4",
+
+	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/bbb_sunflower_2160p_60fps_normal.mp4",
+
+	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/dolby-chameleon-uhd-(www.demolandia.net).mkv",
+
+	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/gopro1.mp4",
+
+	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/imax-cliffhanger-flat-(www.demolandia.net).mkv",
+
+	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/tearsofsteel_4k.mov",
+	// }
 
 	complex := ""
 	complexOut := ""
@@ -70,12 +72,14 @@ func main() {
 		// 	continue
 		// }
 		cmd = append(cmd, "-i")
-		cmd = append(cmd, file)
+		cmd = append(cmd, path.Join(rootDir, file.Name()))
 		complex += fmt.Sprintf("[%d:v]scale=1920:1080,setdar=16/9[v%d]; ", videos, videos)
-		complexOut += fmt.Sprintf("[v%d][%d:a]", videos, videos)
+		complex += fmt.Sprintf("[%d:a]aformat=sample_fmts=s32:sample_rates=48000[arated%d];[arated%d]channelsplit=channel_layout=stereo[FL][FR][a%d]", videos, videos, videos, videos)
+		// aformat=sample_fmts=s32:sample_rates=48000[a];[a]channelsplit=channel_layout=stereo[FL][FR]
+		complexOut += fmt.Sprintf("[v%d][a%d]", videos, videos)
 		videos++
 	}
-	cmd = append(cmd, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "60", "-c:a", "aac", "-ac", "2")
+	cmd = append(cmd, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "60", "-c:a", "aac", "-ac", "2", "-ar", "48000")
 	//cmd = append(cmd, "-vf", "scale=1920:1080")
 	complex += complexOut
 	complex += fmt.Sprintf("concat=n=%d:v=1:a=1 [vv] [aa]", videos)
