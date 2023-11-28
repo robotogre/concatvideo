@@ -37,11 +37,12 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
-	files := []string{"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/LG 4K HDR Demo - New York.ts",
+	files := []string{
+		// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/LG 4K HDR Demo - New York.ts",
 
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-Ride-on-Board-4K-(www.demolandia.net).ts",
+		// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-Ride-on-Board-4K-(www.demolandia.net).ts",
 
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-and-RedBull-See-the-Unexpected-HDR-UHD-4K-(www.demolandia.net).ts",
+		// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-and-RedBull-See-the-Unexpected-HDR-UHD-4K-(www.demolandia.net).ts",
 
 		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony 4K HDR Demo - New York Fashion.mp4",
 
@@ -70,11 +71,11 @@ func main() {
 		// }
 		cmd = append(cmd, "-i")
 		cmd = append(cmd, file)
-		complex += fmt.Sprintf("[%d:v]scale=1920:1080[v%d]; ", videos, videos)
+		complex += fmt.Sprintf("[%d:v]scale=1920:1080,setdar=16/9[v%d]; ", videos, videos)
 		complexOut += fmt.Sprintf("[v%d][%d:a]", videos, videos)
 		videos++
 	}
-	cmd = append(cmd, "-c:v", "libx264", "-r", "60", "-c:a", "aac", "-ac", "2")
+	cmd = append(cmd, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "60", "-c:a", "aac", "-ac", "2")
 	//cmd = append(cmd, "-vf", "scale=1920:1080")
 	complex += complexOut
 	complex += fmt.Sprintf("concat=n=%d:v=1:a=1 [vv] [aa]", videos)
