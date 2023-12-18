@@ -58,7 +58,7 @@ func MakeVideos(outTypes []OutType, useS3 bool) []error {
 	errs := []error{}
 	var err error
 	var paths []string
-	
+
 	if useS3 {
 		paths = getS3Videos()
 	} else {
@@ -121,7 +121,7 @@ func makeVideo(outType OutType, files []string) error {
 		}
 		cmd = append(cmd, "-i")
 		cmd = append(cmd, file)
-		complex += fmt.Sprintf("[%d:v]scale=%d:%d,pad=1280:ih:(ow-iw)/2[v%d]; ", videos, outputType.Res.Width, outputType.Res.Height, videos)
+		complex += fmt.Sprintf("[%d:v]scale=%d:%d:force_original_aspect_ratio=1,pad=%d:%d:(ow-iw)/2:(oh-ih)/2[v%d]; ", videos, outputType.Res.Width, outputType.Res.Height, outputType.Res.Width, outputType.Res.Height, videos)
 		complex += fmt.Sprintf("[%d:a]aformat=sample_fmts=s32:sample_rates=48000[a%d]; ", videos, videos)
 		// aformat=sample_fmts=s32:sample_rates=48000[a];[a]channelsplit=channel_layout=stereo[FL][FR]
 		complexOut += fmt.Sprintf("[v%d][a%d]", videos, videos)
