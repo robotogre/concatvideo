@@ -198,19 +198,19 @@ func getS3Videos() []string {
 
 		// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-and-RedBull-See-the-Unexpected-HDR-UHD-4K-(www.demolandia.net).ts",
 
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony 4K HDR Demo - New York Fashion.mp4",
+		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/gopro1.mp4",
 
 		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony-Food-Fizzle-UHD-4K-(www.demolandia.net).mp4",
+
+		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony 4K HDR Demo - New York Fashion.mp4",
+
+		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/imax-cliffhanger-flat-(www.demolandia.net).mkv",
+
+		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/dolby-chameleon-uhd-(www.demolandia.net).mkv",
 
 		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony-Swordsmith-HDR-UHD-4K-(www.demolandia.net).mp4",
 
 		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/bbb_sunflower_2160p_60fps_normal.mp4",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/dolby-chameleon-uhd-(www.demolandia.net).mkv",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/gopro1.mp4",
-
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/imax-cliffhanger-flat-(www.demolandia.net).mkv",
 
 		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/tearsofsteel_4k.mov",
 	}
