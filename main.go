@@ -33,7 +33,7 @@ func main() {
 	// 	fmt.Printf("%v\n", obj.Key)
 	// }
 	// return
-	rootDir := "/videos"
+	rootDir := "/videos" //"/Users/tom/Videos/theater_demos" //
 	files, err := os.ReadDir(rootDir)
 	if err != nil {
 		log.Fatal(err)
@@ -68,13 +68,13 @@ func main() {
 	cmd := []string{"-y"}
 	videos := 0
 	for _, file := range files {
-		// if file.Name() == ".DS_Store" {
-		// 	continue
-		// }
+		if file.Name() == ".DS_Store" {
+			continue
+		}
 		cmd = append(cmd, "-i")
 		cmd = append(cmd, path.Join(rootDir, file.Name()))
 		complex += fmt.Sprintf("[%d:v]scale=1920:1080,setdar=16/9[v%d]; ", videos, videos)
-		complex += fmt.Sprintf("[%d:a]aformat=sample_fmts=s32:sample_rates=48000[arated%d];[arated%d]channelsplit=channel_layout=stereo[FL][FR][a%d]", videos, videos, videos, videos)
+		complex += fmt.Sprintf("[%d:a]aformat=sample_fmts=s32:sample_rates=48000[a%d]; ", videos, videos)
 		// aformat=sample_fmts=s32:sample_rates=48000[a];[a]channelsplit=channel_layout=stereo[FL][FR]
 		complexOut += fmt.Sprintf("[v%d][a%d]", videos, videos)
 		videos++
