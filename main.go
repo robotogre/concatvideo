@@ -60,7 +60,15 @@ func MakeVideos(outTypes []OutType, useS3 bool) []error {
 	var paths []string
 
 	if useS3 {
-		paths = getS3Videos()
+		p := getS3Videos()
+		for _, pa := range p {
+			out, err := exec.Command("wget", pa).CombinedOutput()
+			if err != nil {
+				return append(errs, err)
+			}
+			paths = append(paths, path.Base(pa))
+			fmt.Printf("%s", out)
+		}
 	} else {
 		paths, err = getLocalVideoList()
 	}
