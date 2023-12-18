@@ -24,6 +24,8 @@ const (
 	OUT_1080 OutType = "HD"
 )
 
+var fast bool
+
 type Resolution struct {
 	Width  int
 	Height int
@@ -38,6 +40,7 @@ func main() {
 
 	res := flag.String("res", "HD", "Comma-delimited list of output resolutions. 'HD' and '4K'.")
 	useS3 := flag.Bool("s3", false, "If true, input videos will come from S3. If false, local ~/Videos folder.")
+	fast = *flag.Bool("fast", false, "If true, input videos will come from S3. If false, local ~/Videos folder.")
 
 	flag.Parse()
 
@@ -141,7 +144,12 @@ func makeVideo(outType OutType, files []string) error {
 	cmd = append(cmd, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "60", "-c:a", "libfdk_aac", "-b:a", "256k", "-ac", "2", "-ar", "48000")
 	cmd = append(cmd, "-sws_flags", "spline+accurate_rnd+full_chroma_int")
 	cmd = append(cmd, "-color_range", "1", "-colorspace", "1", "-color_primaries", "1", "-color_trc", "1")
-	cmd = append(cmd, "-preset", "veryslow", "-crf", "17")
+	if fast {
+		cmd = append(cmd, "-preset", "ultrafast")
+	} else {
+		cmd = append(cmd, "-preset", "veryslow", "-crf", "17")
+	}
+
 	//cmd = append(cmd, "-vf", "scale=1920:1080")
 	complex += complexOut
 	complex += fmt.Sprintf("concat=n=%d:v=1:a=1 [vv] [aa]", videos)
