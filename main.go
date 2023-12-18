@@ -24,7 +24,9 @@ const (
 	OUT_1080 OutType = "HD"
 )
 
+var outFileName string = "theaterdemos"
 var fast *bool
+var short *bool
 
 type Resolution struct {
 	Width  int
@@ -40,7 +42,8 @@ func main() {
 
 	res := flag.String("res", "HD", "Comma-delimited list of output resolutions. 'HD' and '4K'.")
 	useS3 := flag.Bool("s3", false, "If true, input videos will come from S3. If false, local ~/Videos folder.")
-	fast = flag.Bool("fast", false, "If true, input videos will come from S3. If false, local ~/Videos folder.")
+	fast = flag.Bool("fast", false, "Low quality, ultrafast - for testing config")
+	short = flag.Bool("short", false, "Only encode ten seconds")
 
 	flag.Parse()
 
@@ -137,7 +140,7 @@ func makeVideo(outType OutType, files []string) error {
 		}
 		cmd = append(cmd, "-i")
 		cmd = append(cmd, file)
-		complex += fmt.Sprintf("[%d:v]colorspace=bt709:iall=bt601-6-625:fast=1,scale=%d:%d:force_original_aspect_ratio=1,pad=%d:%d:(ow-iw)/2:(oh-ih)/2[v%d]; ", videos, outputType.Res.Width, outputType.Res.Height, outputType.Res.Width, outputType.Res.Height, videos)
+		complex += fmt.Sprintf("[%d:v]colorspace=bt709:iall=bt601-6-625:fast=1,scale=%d:%d:force_original_aspect_ratio=1,pad=%d:%d:(ow-iw)/2:(oh-ih)/2,drawtext=text='':x=(w-tw)/2:y=(lh):fontsize=40:fontcolor=white:timecode='00\\:00\\:00\\:00':timecode_rate=%d[v%d]; ", videos, outputType.Res.Width, outputType.Res.Height, outputType.Res.Width, outputType.Res.Height, 60, videos)
 		complex += fmt.Sprintf("[%d:a]aformat=sample_fmts=s32:sample_rates=48000[a%d]; ", videos, videos)
 		// aformat=sample_fmts=s32:sample_rates=48000[a];[a]channelsplit=channel_layout=stereo[FL][FR]
 		complexOut += fmt.Sprintf("[v%d][a%d]", videos, videos)
@@ -147,9 +150,14 @@ func makeVideo(outType OutType, files []string) error {
 	cmd = append(cmd, "-sws_flags", "spline+accurate_rnd+full_chroma_int")
 	cmd = append(cmd, "-color_range", "1", "-colorspace", "1", "-color_primaries", "1", "-color_trc", "1")
 	if *fast {
+		outFileName += "-fast"
 		cmd = append(cmd, "-preset", "ultrafast")
 	} else {
 		cmd = append(cmd, "-preset", "veryslow", "-crf", "17")
+	}
+	if *short {
+		outFileName += "-short"
+		cmd = append(cmd, "-t", "10")
 	}
 
 	//cmd = append(cmd, "-vf", "scale=1920:1080")
@@ -158,7 +166,7 @@ func makeVideo(outType OutType, files []string) error {
 	cmd = append(cmd, "-filter_complex", complex)
 	cmd = append(cmd, "-map", "[vv]", "-map", "[aa]")
 	cmd = append(cmd, "-movflags", "+faststart") // Put the  MOOV atom at the beginning so FFpeobe can quickly parse it.
-	cmd = append(cmd, "theaterdemos"+string(outputType.outType)+".mp4")
+	cmd = append(cmd, outFileName+string(outputType.outType)+".mp4")
 	fmt.Printf("%v\n", cmd)
 	out, err := exec.Command("ffmpeg", cmd...).CombinedOutput()
 	if err != nil {
@@ -198,7 +206,7 @@ func getS3Videos() []string {
 
 		// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-and-RedBull-See-the-Unexpected-HDR-UHD-4K-(www.demolandia.net).ts",
 
-		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/gopro1.mp4",
+		//"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/gopro1.mp4",
 
 		"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony-Food-Fizzle-UHD-4K-(www.demolandia.net).mp4",
 
