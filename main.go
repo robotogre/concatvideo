@@ -62,7 +62,7 @@ func MakeVideos(outTypes []OutType, useS3 bool) []error {
 	if useS3 {
 		p := getS3Videos()
 		for _, pa := range p {
-			if _, err := os.Stat("sample.txt"); err != nil {
+			if _, err := os.Stat(path.Base(pa)); err != nil {
 				r, err := exec.Command("wget", pa).CombinedOutput()
 				if err != nil {
 					return append(errs, err)
@@ -138,7 +138,7 @@ func makeVideo(outType OutType, files []string) error {
 		complexOut += fmt.Sprintf("[v%d][a%d]", videos, videos)
 		videos++
 	}
-	cmd = append(cmd, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "60", "-c:a", "aac", "-ac", "2", "-ar", "48000")
+	cmd = append(cmd, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "60", "-c:a", "libfdk_aac", "-b:a", "256k", "-ac", "2", "-ar", "48000")
 	cmd = append(cmd, "-preset", "veryslow", "-crf", "17")
 	//cmd = append(cmd, "-vf", "scale=1920:1080")
 	complex += complexOut
