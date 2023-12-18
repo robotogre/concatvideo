@@ -62,12 +62,15 @@ func MakeVideos(outTypes []OutType, useS3 bool) []error {
 	if useS3 {
 		p := getS3Videos()
 		for _, pa := range p {
-			out, err := exec.Command("wget", pa).CombinedOutput()
-			if err != nil {
-				return append(errs, err)
+			if _, err := os.Stat("sample.txt"); err != nil {
+				r, err := exec.Command("wget", pa).CombinedOutput()
+				if err != nil {
+					return append(errs, err)
+				}
+				fmt.Printf("%s", r)
 			}
 			paths = append(paths, path.Base(pa))
-			fmt.Printf("%s", out)
+
 		}
 	} else {
 		paths, err = getLocalVideoList()
@@ -142,7 +145,7 @@ func makeVideo(outType OutType, files []string) error {
 	cmd = append(cmd, "-filter_complex", complex)
 	cmd = append(cmd, "-map", "[vv]", "-map", "[aa]")
 	cmd = append(cmd, "-movflags", "+faststart") // Put the  MOOV atom at the beginning so FFpeobe can quickly parse it.
-	cmd = append(cmd, "theaterdemos.mp4")
+	cmd = append(cmd, "theaterdemos"+string(outputType.outType)+".mp4")
 	fmt.Printf("%v\n", cmd)
 	out, err := exec.Command("ffmpeg", cmd...).CombinedOutput()
 	if err != nil {
