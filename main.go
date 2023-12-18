@@ -139,6 +139,7 @@ func makeVideo(outType OutType, files []string) error {
 		videos++
 	}
 	cmd = append(cmd, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "60", "-c:a", "aac", "-ac", "2", "-ar", "48000")
+	cmd = append(cmd, "-preset", "veryslow", "-crf", "17")
 	//cmd = append(cmd, "-vf", "scale=1920:1080")
 	complex += complexOut
 	complex += fmt.Sprintf("concat=n=%d:v=1:a=1 [vv] [aa]", videos)
