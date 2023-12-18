@@ -132,13 +132,15 @@ func makeVideo(outType OutType, files []string) error {
 		}
 		cmd = append(cmd, "-i")
 		cmd = append(cmd, file)
-		complex += fmt.Sprintf("[%d:v]scale=%d:%d:force_original_aspect_ratio=1,pad=%d:%d:(ow-iw)/2:(oh-ih)/2[v%d]; ", videos, outputType.Res.Width, outputType.Res.Height, outputType.Res.Width, outputType.Res.Height, videos)
+		complex += fmt.Sprintf("[%d:v]colorspace=bt709:iall=bt601-6-625:fast=1,scale=%d:%d:force_original_aspect_ratio=1,pad=%d:%d:(ow-iw)/2:(oh-ih)/2[v%d]; ", videos, outputType.Res.Width, outputType.Res.Height, outputType.Res.Width, outputType.Res.Height, videos)
 		complex += fmt.Sprintf("[%d:a]aformat=sample_fmts=s32:sample_rates=48000[a%d]; ", videos, videos)
 		// aformat=sample_fmts=s32:sample_rates=48000[a];[a]channelsplit=channel_layout=stereo[FL][FR]
 		complexOut += fmt.Sprintf("[v%d][a%d]", videos, videos)
 		videos++
 	}
 	cmd = append(cmd, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "60", "-c:a", "libfdk_aac", "-b:a", "256k", "-ac", "2", "-ar", "48000")
+	cmd = append(cmd, "-sws_flags", "spline+accurate_rnd+full_chroma_int")
+	cmd = append(cmd, "-color_range", "1", "-colorspace", "1", "-color_primaries", "1", "-color_trc", "1")
 	cmd = append(cmd, "-preset", "veryslow", "-crf", "17")
 	//cmd = append(cmd, "-vf", "scale=1920:1080")
 	complex += complexOut
