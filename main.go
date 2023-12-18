@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	//"go/types"
 	"log"
@@ -14,8 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
-
-var output4K bool
 
 type OutType string
 
@@ -36,17 +36,39 @@ type Output struct {
 
 func main() {
 
-	errs := MakeVideos([]OutType{})
+	res := flag.String("res", "HD", "Comma-delimited list of output resolutions. 'HD' and '4K'.")
+	useS3 := flag.Bool("s3", false, "If true, input videos will come from S3. If false, local ~/Videos folder.")
+
+	flag.Parse()
+
+	reses := strings.Split(*res, ",")
+	outTypes := []OutType{}
+	for _, ot := range reses {
+		outTypes = append(outTypes, OutType(ot))
+	}
+
+	errs := MakeVideos(outTypes, *useS3)
 	for _, err := range errs {
 		fmt.Printf("error: %s\n", err.Error())
 	}
 }
 
-func MakeVideos(outTypes []OutType) []error {
+func MakeVideos(outTypes []OutType, useS3 bool) []error {
 
 	errs := []error{}
+	var err error
+	paths := []string{}
+	if useS3 {
+	} else {
+		paths, err = getLocalVideoList()
+	}
+	if err != nil {
+		errs = append(errs, err)
+		return errs
+	}
+
 	for _, ot := range outTypes {
-		err := makeVideo(ot)
+		err := makeVideo(ot, paths)
 		if err != nil {
 			errs = append(errs, err)
 		}
@@ -54,12 +76,20 @@ func MakeVideos(outTypes []OutType) []error {
 	return errs
 }
 
-func makeVideo(outType OutType) error {
+func getLocalVideoList() ([]string, error) {
 	rootDir := "/videos" //"/Users/tom/Videos/theater_demos" //
+	paths := []string{}
 	files, err := os.ReadDir(rootDir)
 	if err != nil {
-		return err
+		return paths, err
 	}
+	for _, file := range files {
+		paths = append(paths, path.Join(rootDir, file.Name()))
+	}
+	return paths, nil
+}
+
+func makeVideo(outType OutType, files []string) error {
 
 	outputType := Output{
 		outType: outType,
@@ -84,11 +114,11 @@ func makeVideo(outType OutType) error {
 	cmd := []string{"-y"}
 	videos := 0
 	for _, file := range files {
-		if file.Name() == ".DS_Store" {
+		if strings.Contains(file, ".DS_Store") {
 			continue
 		}
 		cmd = append(cmd, "-i")
-		cmd = append(cmd, path.Join(rootDir, file.Name()))
+		cmd = append(cmd, file)
 		complex += fmt.Sprintf("[%d:v]scale=%d:%d,pad=1280:ih:(ow-iw)/2[v%d]; ", videos, outputType.Res.Width, outputType.Res.Height, videos)
 		complex += fmt.Sprintf("[%d:a]aformat=sample_fmts=s32:sample_rates=48000[a%d]; ", videos, videos)
 		// aformat=sample_fmts=s32:sample_rates=48000[a];[a]channelsplit=channel_layout=stereo[FL][FR]
