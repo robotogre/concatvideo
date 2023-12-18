@@ -15,53 +15,69 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
+var output4K bool
+
+type OutType string
+
+const (
+	OUT_4K   OutType = "4K"
+	OUT_1080 OutType = "HD"
+)
+
+type Resolution struct {
+	Width  int
+	Height int
+}
+
+type Output struct {
+	outType OutType
+	Res     Resolution
+}
+
 func main() {
 
-	// cfg, err := config.LoadDefaultConfig(context.TODO(),
-	// 	config.WithRegion("us-west-2"),
-	// )
-	// if err != nil {
-	// 	// handle error
-	// }
-	// client := s3.NewFromConfig(cfg)
-	// bb := BucketBasics{
-	// 	S3Client: client,
-	// }
-	// obs, err := bb.ListObjects("batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd")
+	errs := MakeVideos([]OutType{})
+	for _, err := range errs {
+		fmt.Printf("error: %s\n", err.Error())
+	}
+}
 
-	// for _, obj := range obs {
-	// 	fmt.Printf("%v\n", obj.Key)
-	// }
-	// return
+func MakeVideos(outTypes []OutType) []error {
+
+	errs := []error{}
+	for _, ot := range outTypes {
+		err := makeVideo(ot)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errs
+}
+
+func makeVideo(outType OutType) error {
 	rootDir := "/videos" //"/Users/tom/Videos/theater_demos" //
 	files, err := os.ReadDir(rootDir)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	// files := []string{
-	// 	// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/LG 4K HDR Demo - New York.ts",
-
-	// 	// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-Ride-on-Board-4K-(www.demolandia.net).ts",
-
-	// 	// "https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Samsung-and-RedBull-See-the-Unexpected-HDR-UHD-4K-(www.demolandia.net).ts",
-
-	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony 4K HDR Demo - New York Fashion.mp4",
-
-	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony-Food-Fizzle-UHD-4K-(www.demolandia.net).mp4",
-
-	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/Sony-Swordsmith-HDR-UHD-4K-(www.demolandia.net).mp4",
-
-	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/bbb_sunflower_2160p_60fps_normal.mp4",
-
-	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/dolby-chameleon-uhd-(www.demolandia.net).mkv",
-
-	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/gopro1.mp4",
-
-	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/imax-cliffhanger-flat-(www.demolandia.net).mkv",
-
-	// 	"https://batch-ffmpeg-stack-batchffmpegbucketd97ee012-mkr8qp9ts9jd.s3.us-west-2.amazonaws.com/4K-theater-demos/tearsofsteel_4k.mov",
-	// }
+	outputType := Output{
+		outType: outType,
+	}
+	switch outType {
+	case OUT_1080:
+		outputType.Res = Resolution{
+			Width:  1920,
+			Height: 1080,
+		}
+	case OUT_4K:
+		outputType.Res = Resolution{
+			Width:  3840,
+			Height: 2160,
+		}
+	default:
+		return fmt.Errorf("unhandled OutType %s", outType)
+	}
 
 	complex := ""
 	complexOut := ""
@@ -73,7 +89,7 @@ func main() {
 		}
 		cmd = append(cmd, "-i")
 		cmd = append(cmd, path.Join(rootDir, file.Name()))
-		complex += fmt.Sprintf("[%d:v]scale=1920:1080,setdar=16/9[v%d]; ", videos, videos)
+		complex += fmt.Sprintf("[%d:v]scale=%d:%d,pad=1280:ih:(ow-iw)/2[v%d]; ", videos, outputType.Res.Width, outputType.Res.Height, videos)
 		complex += fmt.Sprintf("[%d:a]aformat=sample_fmts=s32:sample_rates=48000[a%d]; ", videos, videos)
 		// aformat=sample_fmts=s32:sample_rates=48000[a];[a]channelsplit=channel_layout=stereo[FL][FR]
 		complexOut += fmt.Sprintf("[v%d][a%d]", videos, videos)
@@ -90,10 +106,10 @@ func main() {
 	fmt.Printf("%v\n", cmd)
 	out, err := exec.Command("ffmpeg", cmd...).CombinedOutput()
 	if err != nil {
-		//log.Fatal(err)
+		return err
 	}
 	fmt.Printf("%s", out)
-
+	return nil
 }
 
 // BucketBasics encapsulates the Amazon Simple Storage Service (Amazon S3) actions
