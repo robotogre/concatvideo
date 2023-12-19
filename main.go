@@ -140,7 +140,8 @@ func makeVideo(outType OutType, files []string) error {
 		}
 		cmd = append(cmd, "-i")
 		cmd = append(cmd, file)
-		complex += fmt.Sprintf("[%d:v]colorspace=bt709:iall=bt601-6-625:fast=1,scale=%d:%d:force_original_aspect_ratio=1,pad=%d:%d:(ow-iw)/2:(oh-ih)/2,drawtext=text='':x=(w-tw)/2:y=(lh):fontsize=40:fontcolor=white:timecode='00\\:00\\:00\\:00':timecode_rate=%d[v%d]; ", videos, outputType.Res.Width, outputType.Res.Height, outputType.Res.Width, outputType.Res.Height, 60, videos)
+		complex += fmt.Sprintf(`[%d:v]colorspace=bt709:iall=bt601-6-625:fast=1,scale=%d:%d:force_original_aspect_ratio=1,pad=%d:%d:(ow-iw)/2:(oh-ih)/2,drawtext=fontfile='./assets/fonts/AzeretMono.ttf':text='':
+		x=(w-tw-60):y=(h-th-60):fontsize=40:fontcolor=white:timecode='00\:00\:00\:00':timecode_rate=%d[v%d]; `, videos, outputType.Res.Width, outputType.Res.Height, outputType.Res.Width, outputType.Res.Height, 60, videos)
 		complex += fmt.Sprintf("[%d:a]aformat=sample_fmts=s32:sample_rates=48000[a%d]; ", videos, videos)
 		// aformat=sample_fmts=s32:sample_rates=48000[a];[a]channelsplit=channel_layout=stereo[FL][FR]
 		complexOut += fmt.Sprintf("[v%d][a%d]", videos, videos)
@@ -167,7 +168,7 @@ func makeVideo(outType OutType, files []string) error {
 	cmd = append(cmd, "-map", "[vv]", "-map", "[aa]")
 	cmd = append(cmd, "-movflags", "+faststart") // Put the  MOOV atom at the beginning so FFpeobe can quickly parse it.
 	cmd = append(cmd, outFileName+string(outputType.outType)+".mp4")
-	fmt.Printf("%v\n", cmd)
+	//fmt.Printf("%v\n", cmd)
 	out, err := exec.Command("ffmpeg", cmd...).CombinedOutput()
 	if err != nil {
 		return err
